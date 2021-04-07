@@ -1,14 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
-
 import { createGlobalStyle } from 'styled-components';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, ThemeProvider, theme } from '@chakra-ui/react';
+
+import Main from './pages/Main';
 
 const GlobalStyle = createGlobalStyle`
+  html {
+    height: 100%;
+  }
+
   body {
     margin: 0;
+    width: 100%;
+    height: 100%;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
       sans-serif;
@@ -20,13 +26,20 @@ const GlobalStyle = createGlobalStyle`
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
       monospace;
   }
+
+  #root {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 ReactDOM.render(
   <React.StrictMode>
     <ChakraProvider>
-      <GlobalStyle />
-      <App />
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <Main />
+      </ThemeProvider>
     </ChakraProvider>
   </React.StrictMode>,
   document.getElementById('root'),

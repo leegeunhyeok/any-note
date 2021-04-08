@@ -1,10 +1,22 @@
 import styled from 'styled-components';
 import Editor from '../components/Editor';
+import { Button, Slide, useDisclosure } from '@chakra-ui/react';
+import { Note } from '../types';
 
 function Main() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const save = (note: Note) => {
+    console.log(note);
+    onClose();
+  };
+
   return (
     <Content>
-      <Editor />
+      <Button onClick={onOpen}>Open</Button>
+      <Slide in={isOpen}>
+        <Editor onClose={onClose} onSave={save} />
+      </Slide>
     </Content>
   );
 }

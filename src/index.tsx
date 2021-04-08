@@ -31,6 +31,29 @@ const GlobalStyle = createGlobalStyle`
     width: 100%;
     height: 100%;
   }
+
+  // Global transition style
+  .move-enter {
+    opacity: 0.01;
+    transform: translate(-40px, 0)
+  }
+
+  .move-enter-active {
+    opacity: 1;
+    transform: translate(0, 0);
+    transition: all 200ms ease-in;
+  }
+
+  .move-exit {
+    opacity: 1;
+    transform: translate(0, 0)
+  }
+
+  .move-exit-active {
+    opacity: 0.01;
+    transform: translate(40px, 0);
+    transition: all 200ms ease-in;
+  }
 `;
 
 ReactDOM.render(

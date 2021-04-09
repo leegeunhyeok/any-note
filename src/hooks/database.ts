@@ -66,4 +66,4 @@ const reducer = (state: NoteDBState, action: NoteActions): NoteDBState => {
   }
 };
 
-export const useNoteDB = () => useReducer(reducer, { notes: [] });
+export const useNoteStore = () => useReducer(reducer, { notes: [] });

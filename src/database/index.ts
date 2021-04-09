@@ -1,4 +1,5 @@
 import BoxDB, { BoxModel } from 'bxd';
+import { Note } from '../types';
 
 export const noteScheme = {
   _id: {
@@ -11,13 +12,15 @@ export const noteScheme = {
   date: BoxDB.Types.DATE,
 };
 
+export type NoteModel = BoxModel<typeof noteScheme>;
+
 export default class DBManager {
   private static instance: DBManager;
   private box: BoxDB;
-  private noteModel: BoxModel<typeof noteScheme>;
+  private noteModel: NoteModel;
 
   /**
-   * Returns instance
+   * Returns instancew
    *
    * @returns DBManager instance
    */
@@ -60,44 +63,10 @@ export default class DBManager {
   }
 
   /**
-   * Save note data
-   *
-   * @param title Note title
-   * @param content Note content
-   * @param images Attached images
-   */
-  async addNote(title: string, content: string, images: File[], date: Date) {
-    return await this.noteModel.add({
-      _id: +date,
-      title,
-      content,
-      images,
-      date,
-    });
-  }
-
-  /**
    * Update target note record
-   *
-   * @param key Target note key
-   * @param title Note title
-   * @param content Note content
-   * @param images Attached images
    */
-  async updateNote(
-    key: IDBValidKey,
-    title: string,
-    content: string,
-    images: File[],
-    date: Date,
-  ) {
-    await this.noteModel.put({
-      _id: key,
-      title,
-      content,
-      images,
-      date,
-    });
+  async putNote(note: Note) {
+    await this.noteModel.put(note);
   }
 
   /**

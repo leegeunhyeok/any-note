@@ -8,12 +8,7 @@ import {
   IconButton,
   Collapse,
 } from '@chakra-ui/react';
-import {
-  CloseIcon,
-  CheckIcon,
-  AttachmentIcon,
-  RepeatIcon,
-} from '@chakra-ui/icons';
+import { CloseIcon, CheckIcon, AttachmentIcon } from '@chakra-ui/icons';
 import { Note, ImageWithPreview } from '../types';
 import styled from 'styled-components';
 import { toDataURL } from '../utils';
@@ -38,8 +33,17 @@ function Editor({ onClose, onSave }: EditorProps) {
   };
 
   // Create note data
-  const save = () =>
-    onSave({ title, content, images: images.map((img) => img.file) });
+  const save = () => {
+    const date = new Date();
+    onSave({
+      _id: +date,
+      title,
+      content,
+      images: images.map((img) => img.file),
+      date,
+    });
+  };
+
   const upload = (files: FileList | null) => {
     if (!files) return;
     const image = files[0];
@@ -103,13 +107,6 @@ function Editor({ onClose, onSave }: EditorProps) {
               aria-label="Add image"
               icon={<AttachmentIcon />}
               onClick={openFileHandler}
-            />
-            <IconButton
-              size="sm"
-              bg="white"
-              color="gray.400"
-              aria-label="Change note color"
-              icon={<RepeatIcon />}
             />
           </Box>
           <Box pt="1" pb="5" flex="1">

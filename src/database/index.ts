@@ -1,6 +1,6 @@
 import BoxDB, { BoxModel } from 'bxd';
 
-const noteScheme = {
+export const noteScheme = {
   _id: {
     type: BoxDB.Types.NUMBER,
     key: true,
@@ -41,10 +41,13 @@ export default class DBManager {
   }
 
   init() {
-    if (this.box.isReady()) {
-      throw new Error('Database already opened');
-    }
-    return this.box.open();
+    return new Promise((resolve, reject) => {
+      if (this.box.isReady()) {
+        reject(new Error('Database already opened'));
+      } else {
+        resolve(this.box.open());
+      }
+    });
   }
 
   /**
@@ -63,14 +66,13 @@ export default class DBManager {
    * @param content Note content
    * @param images Attached images
    */
-  async addNote(title: string, content: string, images: File[]) {
-    const currentDatetime = new Date();
-    await this.noteModel.add({
-      _id: +currentDatetime,
+  async addNote(title: string, content: string, images: File[], date: Date) {
+    return await this.noteModel.add({
+      _id: +date,
       title,
       content,
       images,
-      date: currentDatetime,
+      date,
     });
   }
 
@@ -87,13 +89,14 @@ export default class DBManager {
     title: string,
     content: string,
     images: File[],
+    date: Date,
   ) {
     await this.noteModel.put({
       _id: key,
       title,
       content,
       images,
-      date: new Date(),
+      date,
     });
   }
 

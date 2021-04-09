@@ -62,12 +62,4 @@ const FitTransitionGroup = styled(TransitionGroup)`
 const ScaleBox = styled(Box)`
   overflow: hidden;
   cursor: pointer;
-
-  & > * {
-    transition: transform 0.3s;
-  }
-
-  &:hover > * {
-    transform: scale(1.1);
-  }
 `;

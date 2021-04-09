@@ -9,9 +9,6 @@ import {
   createStandaloneToast,
 } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
-import Editor from '../components/Editor';
-import Note from '../components/Note';
-import { Note as NoteType } from '../types';
 import {
   useNoteStore,
   addNote,
@@ -20,6 +17,9 @@ import {
   init,
 } from '../hooks/database';
 import DBManager from '../database';
+import Editor from '../components/Editor';
+import Note from '../components/Note';
+import { Note as NoteType } from '../types';
 
 const toast = createStandaloneToast();
 const toastOption = { isClosable: true };
@@ -28,7 +28,7 @@ function Main() {
   // Value for reset editor component
   const v = useRef(0);
   const db = useRef(DBManager.getInstance());
-  const [noteId, setNoteId] = useState(0);
+  const [selectedNote, setNote] = useState<NoteType | null>(null);
   const [hasJob, setJobState] = useState(false);
   const [state, dispatch] = useNoteStore();
   const editor = useDisclosure();
@@ -47,8 +47,8 @@ function Main() {
   const onOpen = () => ++v.current && editor.onOpen();
 
   // Open exist note
-  const onClickNote = (noteId: number) => {
-    setNoteId(noteId);
+  const onClickNote = (note: NoteType) => {
+    setNote(note);
     onOpen();
   };
 
@@ -74,20 +74,20 @@ function Main() {
 
     const noteData = {
       ...note,
-      ...(noteId ? { _id: noteId, date: new Date() } : null),
+      ...(selectedNote ? { _id: selectedNote._id, date: new Date() } : null),
     };
     setJobState(true);
 
     db.current
       .putNote(noteData)
       .then(() => {
-        dispatch((noteId ? updateNote : addNote)(noteData));
+        dispatch((selectedNote ? updateNote : addNote)(noteData));
         onClose();
       })
       .catch(() => {
         toast({
           ...toastOption,
-          title: `Cannot ${noteId ? 'update' : 'save'} note`,
+          title: `Cannot ${selectedNote ? 'update' : 'save'} note`,
           status: 'error',
         });
       })
@@ -95,7 +95,7 @@ function Main() {
   };
 
   const onClose = () => {
-    setNoteId(0);
+    setNote(null);
     setJobState(false);
     editor.onClose();
   };
@@ -105,7 +105,7 @@ function Main() {
       <Note
         note={note}
         key={note._id}
-        onClick={() => onClickNote(note._id)}
+        onClick={() => onClickNote(note)}
         onDelete={() => onNoteDelete(note._id)}
       />
     ));
@@ -130,7 +130,12 @@ function Main() {
         </Button>
       </Box>
       <Slide in={editor.isOpen}>
-        <Editor onClose={onClose} onSave={onNoteSave} key={v.current} />
+        <Editor
+          initialNote={selectedNote || void 0}
+          onClose={onClose}
+          onSave={onNoteSave}
+          key={v.current}
+        />
       </Slide>
     </Content>
   );

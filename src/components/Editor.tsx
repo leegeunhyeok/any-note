@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Flex,
   Container,
@@ -15,15 +15,36 @@ import { toDataURL } from '../utils';
 import ImagePreview from './ImagePreview';
 
 interface EditorProps {
+  initialNote?: Note;
   onClose: React.MouseEventHandler<HTMLButtonElement>;
   onSave: (note: Note) => void;
 }
 
-function Editor({ onClose, onSave }: EditorProps) {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+function Editor({ initialNote, onClose, onSave }: EditorProps) {
+  const [title, setTitle] = useState(initialNote?.title || '');
+  const [content, setContent] = useState(initialNote?.content || '');
   const [images, setImages] = useState<ImageWithPreview[]>([]);
   const file = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (initialNote?.images.length) {
+      Promise.all(
+        initialNote.images.reduce(
+          (prev, image) => [...prev, toDataURL(image)],
+          [] as Promise<string>[],
+        ),
+      )
+        .then((imageSources) => {
+          return initialNote.images.map((imageFile, idx) => ({
+            file: imageFile,
+            src: imageSources[idx],
+          }));
+        })
+        .then((images) => {
+          setImages(images);
+        });
+    }
+  }, [initialNote]);
 
   // Handler for input/textarea
   const handleOnChange = (

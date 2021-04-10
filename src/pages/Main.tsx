@@ -38,9 +38,10 @@ function Main() {
     db.current
       .init()
       .then(() => db.current.getNotes().then((notes) => dispatch(init(notes))))
-      .catch(() =>
-        toast({ ...toastOption, title: 'Cannot load notes', status: 'error' }),
-      );
+      .catch((err) => {
+        console.log(err);
+        toast({ ...toastOption, title: 'Cannot load notes', status: 'error' });
+      });
   }, [db, dispatch]);
 
   // Reset editor and open
@@ -58,7 +59,8 @@ function Main() {
     db.current
       .deleteNote(noteId)
       .then(() => dispatch(deleteNote(noteId)))
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         toast({
           ...toastOption,
           title: `Cannot delete note`,
@@ -84,7 +86,8 @@ function Main() {
         dispatch((selectedNote ? updateNote : addNote)(noteData));
         onClose();
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         toast({
           ...toastOption,
           title: `Cannot ${selectedNote ? 'update' : 'save'} note`,

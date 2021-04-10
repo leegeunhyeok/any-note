@@ -13,3 +13,7 @@ export const toDataURL = (file: File): Promise<string> => {
     reader.readAsDataURL(file);
   });
 };
+
+export const delay = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};

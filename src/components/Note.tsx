@@ -4,7 +4,7 @@ import { CloseIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import ImagePreview from './ImagePreview';
-import { Note as NoteType } from '../types';
+import { Note as NoteType, NoteImage } from '../types';
 
 interface NoteProps {
   note: NoteType;
@@ -13,7 +13,7 @@ interface NoteProps {
 }
 
 function Note({ note, onClick, onDelete }: NoteProps) {
-  const [images] = useState<string[]>(note.images);
+  const [images] = useState<NoteImage[]>(note.images);
 
   const deleteNote = (event: React.MouseEvent) => {
     event.stopPropagation();

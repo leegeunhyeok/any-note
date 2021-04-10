@@ -6,12 +6,13 @@ import {
   Input,
   Textarea,
   IconButton,
+  Progress,
   Collapse,
 } from '@chakra-ui/react';
 import { CloseIcon, CheckIcon, AttachmentIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
-import { Note } from '../types';
-import { toDataURL } from '../utils';
+import { Note, NoteImage } from '../types';
+import { toDataURL, delay } from '../utils';
 import ImagePreview from './ImagePreview';
 
 interface EditorProps {
@@ -23,7 +24,8 @@ interface EditorProps {
 function Editor({ initialNote, onClose, onSave }: EditorProps) {
   const [title, setTitle] = useState(initialNote?.title || '');
   const [content, setContent] = useState(initialNote?.content || '');
-  const [images, setImages] = useState<string[]>(initialNote?.images || []);
+  const [images, setImages] = useState<NoteImage[]>(initialNote?.images || []);
+  const [uploading, setUploadingState] = useState(false);
   const file = useRef<HTMLInputElement>(null);
 
   // Handler for input/textarea
@@ -48,7 +50,14 @@ function Editor({ initialNote, onClose, onSave }: EditorProps) {
   const upload = (files: FileList | null) => {
     if (!files) return;
     const image = files[0];
-    toDataURL(image).then((src) => setImages([...images, src]));
+    setUploadingState(true);
+
+    // Convert
+    Promise.all([toDataURL(image), delay(500)])
+      .then(([src]) => setImages([...images, { name: image.name, src }]))
+      .finally(() => {
+        setUploadingState(false);
+      });
   };
 
   const openFileHandler = () => {
@@ -107,7 +116,7 @@ function Editor({ initialNote, onClose, onSave }: EditorProps) {
               onClick={openFileHandler}
             />
           </Box>
-          <Box pt="1" pb="5" flex="1">
+          <Box pt="1" pb="2" flex="1">
             <Textarea
               h="100%"
               bg="white"
@@ -117,6 +126,9 @@ function Editor({ initialNote, onClose, onSave }: EditorProps) {
               spellCheck={false}
             />
           </Box>
+          <Collapse in={uploading} animateOpacity>
+            <Progress size="xs" mb="2" isIndeterminate />
+          </Collapse>
           <Collapse
             startingHeight="0px"
             endingHeight="12vh"

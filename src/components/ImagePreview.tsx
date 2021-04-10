@@ -1,10 +1,11 @@
 import { useRef } from 'react';
 import { Box, Image } from '@chakra-ui/react';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import styled from 'styled-components';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { NoteImage } from '../types';
 
 interface ImagePreviewProps {
-  images: string[];
+  images: NoteImage[];
   onImageClick?: (index: number) => void;
 }
 
@@ -14,7 +15,7 @@ function ImagePreview({ images, onImageClick }: ImagePreviewProps) {
   const imageList = images.map((image, i) => (
     <CSSTransition
       nodeRef={nodeRef}
-      key={image}
+      key={image.name}
       timeout={200}
       classNames="move"
     >
@@ -29,7 +30,7 @@ function ImagePreview({ images, onImageClick }: ImagePreviewProps) {
         ref={nodeRef}
         onClick={() => onImageClick && onImageClick(i)}
       >
-        <Image h="100%" src={image} />
+        <Image h="100%" src={image.src} />
       </ScaleBox>
     </CSSTransition>
   ));

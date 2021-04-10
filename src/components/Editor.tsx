@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import {
   Flex,
   Container,
@@ -9,8 +9,8 @@ import {
   Collapse,
 } from '@chakra-ui/react';
 import { CloseIcon, CheckIcon, AttachmentIcon } from '@chakra-ui/icons';
-import { Note, ImageWithPreview } from '../types';
 import styled from 'styled-components';
+import { Note } from '../types';
 import { toDataURL } from '../utils';
 import ImagePreview from './ImagePreview';
 
@@ -23,28 +23,8 @@ interface EditorProps {
 function Editor({ initialNote, onClose, onSave }: EditorProps) {
   const [title, setTitle] = useState(initialNote?.title || '');
   const [content, setContent] = useState(initialNote?.content || '');
-  const [images, setImages] = useState<ImageWithPreview[]>([]);
+  const [images, setImages] = useState<string[]>(initialNote?.images || []);
   const file = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (initialNote?.images.length) {
-      Promise.all(
-        initialNote.images.reduce(
-          (prev, image) => [...prev, toDataURL(image)],
-          [] as Promise<string>[],
-        ),
-      )
-        .then((imageSources) => {
-          return initialNote.images.map((imageFile, idx) => ({
-            file: imageFile,
-            src: imageSources[idx],
-          }));
-        })
-        .then((images) => {
-          setImages(images);
-        });
-    }
-  }, [initialNote]);
 
   // Handler for input/textarea
   const handleOnChange = (
@@ -60,7 +40,7 @@ function Editor({ initialNote, onClose, onSave }: EditorProps) {
       _id: +date,
       title,
       content,
-      images: images.map((img) => img.file),
+      images,
       date,
     });
   };
@@ -68,10 +48,7 @@ function Editor({ initialNote, onClose, onSave }: EditorProps) {
   const upload = (files: FileList | null) => {
     if (!files) return;
     const image = files[0];
-
-    toDataURL(image).then((src) =>
-      setImages([...images, { file: image, src }]),
-    );
+    toDataURL(image).then((src) => setImages([...images, src]));
   };
 
   const openFileHandler = () => {

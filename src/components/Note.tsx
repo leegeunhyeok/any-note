@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Box, Button, Text, Skeleton } from '@chakra-ui/react';
+import { useState } from 'react';
+import { Box, Button, Text } from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import ImagePreview from './ImagePreview';
-import { ImageWithPreview, Note as NoteType } from '../types';
-import { toDataURL } from '../utils';
+import { Note as NoteType } from '../types';
 
 interface NoteProps {
   note: NoteType;
@@ -14,30 +13,7 @@ interface NoteProps {
 }
 
 function Note({ note, onClick, onDelete }: NoteProps) {
-  const [images, setImages] = useState<ImageWithPreview[]>([]);
-  const [loaded, setLoadState] = useState(false);
-
-  useEffect(() => {
-    if (note.images.length) {
-      setLoadState(false);
-      // Mapping image files to dataURL format
-      Promise.all(
-        note.images.reduce(
-          (prev, curr) => [...prev, toDataURL(curr)],
-          [] as Promise<string>[],
-        ),
-      ).then((imageSources) => {
-        const images = note.images.map((imageFile, idx) => ({
-          file: imageFile,
-          src: imageSources[idx],
-        }));
-        setImages(images);
-        setLoadState(true);
-      });
-    } else {
-      setImages([]);
-    }
-  }, [note]);
+  const [images] = useState<string[]>(note.images);
 
   const deleteNote = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -79,9 +55,7 @@ function Note({ note, onClick, onDelete }: NoteProps) {
       </Box>
       {images.length ? (
         <Box h="10vh" mt="2">
-          <Skeleton h="100%" isLoaded={loaded}>
-            <ImagePreview images={images} />
-          </Skeleton>
+          <ImagePreview images={images} />
         </Box>
       ) : null}
     </NoteBox>

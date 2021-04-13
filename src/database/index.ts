@@ -10,7 +10,7 @@ export const noteScheme = {
   content: BoxDB.Types.STRING,
   images: BoxDB.Types.ARRAY,
   date: BoxDB.Types.DATE,
-};
+} as const;
 
 export type NoteModel = BoxModel<typeof noteScheme>;
 

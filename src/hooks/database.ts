@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import { Note } from '../types';
+import { NoteType } from '../models/note';
 
 const INIT = 'INIT' as const;
 const ADD_NOTE = 'ADD_NOTE' as const;
@@ -7,24 +7,24 @@ const UPDATE_NOTE = 'UPDATE_NOTE' as const;
 const DELETE_NOTE = 'DELETE_NOTE' as const;
 
 interface NoteDBState {
-  notes: Note[];
+  notes: NoteType[];
 }
 
-export const init = (notes: Note[]) => {
+export const init = (notes: NoteType[]) => {
   return {
     type: INIT,
     payload: notes,
   };
 };
 
-export const addNote = (note: Note) => {
+export const addNote = (note: NoteType) => {
   return {
     type: ADD_NOTE,
     payload: note,
   };
 };
 
-export const updateNote = (note: Note) => {
+export const updateNote = (note: NoteType) => {
   return {
     type: UPDATE_NOTE,
     payload: note,
@@ -52,10 +52,7 @@ const reducer = (state: NoteDBState, action: NoteActions): NoteDBState => {
       return { notes: [action.payload, ...state.notes] };
     case UPDATE_NOTE:
       return {
-        notes: [
-          action.payload,
-          ...state.notes.filter((note) => note._id !== action.payload._id),
-        ],
+        notes: [action.payload, ...state.notes.filter((note) => note._id !== action.payload._id)],
       };
     case DELETE_NOTE:
       return {

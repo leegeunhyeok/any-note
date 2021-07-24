@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import {
   Container,
@@ -9,17 +9,13 @@ import {
   createStandaloneToast,
 } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
-import {
-  useNoteStore,
-  addNote,
-  updateNote,
-  deleteNote,
-  init,
-} from '../hooks/database';
-import DBManager from '../database';
+import { useNoteStore, addNote, updateNote, deleteNote, init } from '../hooks/database';
 import Editor from '../components/Editor';
 import Note from '../components/Note';
-import { Note as NoteType } from '../types';
+import { Note as NoteModel } from '../models';
+import { BoxContext } from '../database/context';
+import BoxDB from 'bxd';
+import { NoteType } from '../models/note';
 
 const toast = createStandaloneToast();
 const toastOption = { isClosable: true };
@@ -27,7 +23,7 @@ const toastOption = { isClosable: true };
 function Main() {
   // Value for reset editor component
   const v = useRef(0);
-  const db = useRef(DBManager.getInstance());
+  const db = useContext(BoxContext);
   const [selectedNote, setNote] = useState<NoteType | null>(null);
   const [hasJob, setJobState] = useState(false);
   const [state, dispatch] = useNoteStore();
@@ -35,9 +31,9 @@ function Main() {
 
   // Init
   useEffect(() => {
-    db.current
-      .init()
-      .then(() => db.current.getNotes().then((notes) => dispatch(init(notes))))
+    db.open()
+      .then(() => NoteModel.find().get(BoxDB.Order.DESC))
+      .then((notes) => dispatch(init(notes)))
       .catch((err) => {
         console.log(err);
         toast({ ...toastOption, title: 'Cannot load notes', status: 'error' });
@@ -56,8 +52,8 @@ function Main() {
   // Delete exist note
   const onNoteDelete = (noteId: number) => {
     if (hasJob) return;
-    db.current
-      .deleteNote(noteId)
+
+    NoteModel.delete(noteId)
       .then(() => dispatch(deleteNote(noteId)))
       .catch((err) => {
         console.log(err);
@@ -80,8 +76,7 @@ function Main() {
     };
     setJobState(true);
 
-    db.current
-      .putNote(noteData)
+    NoteModel.put(noteData)
       .then(() => {
         dispatch((selectedNote ? updateNote : addNote)(noteData));
         onClose();
@@ -109,7 +104,7 @@ function Main() {
         note={note}
         key={note._id}
         onClick={() => onClickNote(note)}
-        onDelete={() => onNoteDelete(note._id)}
+        onDelete={() => onNoteDelete(note._id || 0)}
       />
     ));
 
@@ -120,14 +115,7 @@ function Main() {
           {renderNoteList()}
         </Box>
       </Container>
-      <Box
-        w="100%"
-        position="fixed"
-        bottom="0"
-        left="0"
-        p="5"
-        textAlign="center"
-      >
+      <Box w="100%" position="fixed" bottom="0" left="0" p="5" textAlign="center">
         <Button bgColor="blue.400" color="white" onClick={onOpen}>
           <AddIcon color="white" />
         </Button>

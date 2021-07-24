@@ -5,6 +5,7 @@ import { createGlobalStyle } from 'styled-components';
 import { ChakraProvider, ThemeProvider, theme } from '@chakra-ui/react';
 
 import Main from './pages/Main';
+import { BoxProvider } from './database/context';
 
 const GlobalStyle = createGlobalStyle`
   html {
@@ -58,12 +59,14 @@ const GlobalStyle = createGlobalStyle`
 
 ReactDOM.render(
   <React.StrictMode>
-    <ChakraProvider>
-      <ThemeProvider theme={theme}>
-        <GlobalStyle />
-        <Main />
-      </ThemeProvider>
-    </ChakraProvider>
+    <BoxProvider>
+      <ChakraProvider>
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <Main />
+        </ThemeProvider>
+      </ChakraProvider>
+    </BoxProvider>
   </React.StrictMode>,
   document.getElementById('root'),
 );

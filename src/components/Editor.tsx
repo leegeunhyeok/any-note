@@ -11,14 +11,15 @@ import {
 } from '@chakra-ui/react';
 import { CloseIcon, CheckIcon, AttachmentIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
-import { Note, NoteImage } from '../types';
+import { NoteImage } from '../types';
 import { toDataURL, delay } from '../utils';
 import ImagePreview from './ImagePreview';
+import { NoteType } from '../models/note';
 
 interface EditorProps {
-  initialNote?: Note;
+  initialNote?: NoteType;
   onClose: React.MouseEventHandler<HTMLButtonElement>;
-  onSave: (note: Note) => void;
+  onSave: (note: NoteType) => void;
 }
 
 function Editor({ initialNote, onClose, onSave }: EditorProps) {
@@ -29,11 +30,11 @@ function Editor({ initialNote, onClose, onSave }: EditorProps) {
   const file = useRef<HTMLInputElement>(null);
 
   // Handler for input/textarea
-  const handleOnChange = (
-    setter: React.Dispatch<React.SetStateAction<string>>,
-  ) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setter(e.target.value);
-  };
+  const handleOnChange =
+    (setter: React.Dispatch<React.SetStateAction<string>>) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setter(e.target.value);
+    };
 
   // Create note data
   const save = () => {
@@ -101,11 +102,7 @@ function Editor({ initialNote, onClose, onSave }: EditorProps) {
             />
           </Box>
           <Box pt="1" textAlign="left">
-            <ImageFileInput
-              type="file"
-              ref={file}
-              onChange={(e) => upload(e.target.files)}
-            />
+            <ImageFileInput type="file" ref={file} onChange={(e) => upload(e.target.files)} />
             <IconButton
               size="sm"
               bg="white"
@@ -129,12 +126,7 @@ function Editor({ initialNote, onClose, onSave }: EditorProps) {
           <Collapse in={uploading} animateOpacity>
             <Progress size="xs" mb="2" isIndeterminate />
           </Collapse>
-          <Collapse
-            startingHeight="0px"
-            endingHeight="12vh"
-            in={images.length > 0}
-            animateOpacity
-          >
+          <Collapse startingHeight="0px" endingHeight="12vh" in={images.length > 0} animateOpacity>
             <ImagePreview images={images} onImageClick={removeImage} />
           </Collapse>
         </Flex>
